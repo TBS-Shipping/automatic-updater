@@ -5,7 +5,7 @@ namespace wyDay.Controls
     /// <summary>Reports the progress in the current update step.</summary>
     /// <param name="sender">Sender</param>
     /// <param name="progress">Progress</param>
-    public delegate void UpdateProgressChanged(object sender, int progress);
+    public delegate void UpdateProgressChanged(object sender, int progress, string url);
 
     /// <summary>Represents the method that will handle an event that is cancelable.</summary>
     /// <param name="sender">The source of the event.</param>

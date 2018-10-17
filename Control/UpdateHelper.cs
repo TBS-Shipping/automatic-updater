@@ -293,8 +293,7 @@ namespace wyDay.Controls
 				if (isDisposed) return;
                 ClientProcess = null;
 
-                if (PipeServerDisconnected != null)
-                    PipeServerDisconnected(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, AUTranslation.C_PrematureExitMessage));
+                PipeServerDisconnected?.Invoke(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, AUTranslation.C_PrematureExitMessage));
             }
 		}
 
@@ -376,8 +375,7 @@ namespace wyDay.Controls
                     sendBuffer.Clear();
 
                     // inform the AutomaticUpdater that wyUpdate is no longer running
-                    if (PipeServerDisconnected != null)
-                        PipeServerDisconnected(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, e.Error.Message));
+                    PipeServerDisconnected?.Invoke(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, e.Error.Message));
                 }
                 else
                 {
@@ -542,8 +540,7 @@ namespace wyDay.Controls
                     catch (Exception)
                     {
                         // inform the AutomaticUpdater that wyUpdate is no longer running
-                        if (PipeServerDisconnected != null)
-                            PipeServerDisconnected(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, "Failed to connect to the new version of wyUpdate.exe"));
+                        PipeServerDisconnected?.Invoke(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, "Failed to connect to the new version of wyUpdate.exe"));
                     }
                     return;
                 }
@@ -562,8 +559,7 @@ namespace wyDay.Controls
                     catch (Exception)
                     {
                         // inform the AutomaticUpdater that wyUpdate is no longer running
-                        if (PipeServerDisconnected != null)
-                            PipeServerDisconnected(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, "Failed to connect to the new version of wyUpdate.exe"));
+                        PipeServerDisconnected?.Invoke(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, "Failed to connect to the new version of wyUpdate.exe"));
                     }
 
                     TryToConnectToPipe(data.ExtraData[0]);
@@ -572,8 +568,7 @@ namespace wyDay.Controls
                     if (!pipeClient.Connected)
                     {
                         // inform the AutomaticUpdater that wyUpdate is no longer running
-                        if (PipeServerDisconnected != null)
-                            PipeServerDisconnected(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, "Failed to connect to the new version of wyUpdate.exe"));
+                        PipeServerDisconnected?.Invoke(this, new UpdateHelperData(Response.Failed, UpdateStep, AUTranslation.C_PrematureExitTitle, "Failed to connect to the new version of wyUpdate.exe"));
                     }
 
                     // begin where we left off
@@ -606,8 +601,8 @@ namespace wyDay.Controls
                 if (data.Action == UpdateAction.UpdateStep && data.UpdateStep == UpdateStep.RestartInfo)
                     ClientWindowHandleToShow = data.ProcessID;
 
-                if (data.ResponseType != Response.Nothing && ProgressChanged != null)
-                    ProgressChanged(this, data);
+                if (data.ResponseType != Response.Nothing)
+                    ProgressChanged?.Invoke(this, data);
             }
         }
 	}

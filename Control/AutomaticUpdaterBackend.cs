@@ -1,6 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 using wyUpdate.Common;
 
 namespace wyDay.Controls
@@ -8,6 +13,7 @@ namespace wyDay.Controls
     /// <summary>Backend for the AutomaticUpdater control.</summary>
     public class AutomaticUpdaterBackend : IDisposable
     {
+        private Logger _logger = LogManager.GetCurrentClassLogger();
         AutoUpdaterInfo AutoUpdaterInfo;
 
         UpdateHelper updateHelper = new UpdateHelper();
@@ -247,6 +253,28 @@ namespace wyDay.Controls
 
         #endregion
 
+        public static void ConfigureNLog(string logPath, LogLevel level)
+        {
+            // Step 1. Create configuration object 
+            var config = new LoggingConfiguration();
+
+            var fileTarget = new FileTarget();
+            config.AddTarget("file", fileTarget);
+
+            // Step 3. Set target properties 
+            string layout = @"${date:format=HH\:mm\:ss.mmm}|${level}|${callsite}|${threadid}|${logger} -> ${message} ${exception:format=ToString,StackTrace:maxInnerExceptionLevel=5}${newline}";
+            fileTarget.FileName = logPath;
+            fileTarget.Layout = layout;
+
+
+            var rule2 = new LoggingRule("*", level, fileTarget);
+            config.LoggingRules.Add(rule2);
+
+            // Step 5. Activate the configuration
+            LogManager.Configuration = config;            
+        }
+
+
         /// <summary>Represents an AutomaticUpdater control.</summary>
         public AutomaticUpdaterBackend()
         {
@@ -254,6 +282,8 @@ namespace wyDay.Controls
             updateHelper.PipeServerDisconnected += updateHelper_PipeServerDisconnected;
             updateHelper.UpdateStepMismatch += updateHelper_UpdateStepMismatch;
             updateHelper.ResendRestartInfo += updateHelper_ResendRestartInfo;
+            ConfigureNLog(Assembly.GetExecutingAssembly().GetName().Name + "-${shortdate}.log.txt", LogLevel.Debug);
+            _logger.Debug("Automatic Updater Backend is ready...");
         }
 
         internal AutomaticUpdaterBackend(bool bufferResponse) : this()
@@ -565,10 +595,8 @@ namespace wyDay.Controls
 
                     break;
                 case Response.Progress:
-
                     // call the progress changed event
-                    if (ProgressChanged != null)
-                        ProgressChanged(this, e.Progress);
+                    ProgressChanged?.Invoke(this, e.Progress, e.ExtraData.FirstOrDefault());
 
                     break;
             }
@@ -735,15 +763,23 @@ namespace wyDay.Controls
         /// <summary>The function that must be called when your app has loaded.</summary>
         public void AppLoaded()
         {
+            this._logger.Info("App has been loaded...");
+
             if (AutoUpdaterInfo == null)
                 throw new FailedToInitializeException();
 
             // if we want to kill ourself, then don't bother checking for updates
             if (ClosingForInstall)
+            {
+                this._logger.Info("Closing for install...");
                 return;
+            }
+            else
+                this._logger.Info("Not closing for install...");
 
             // get the current update step from the info file
             m_UpdateStepOn = AutoUpdaterInfo.UpdateStepOn;
+            this._logger.Info("Update step: " + UpdateStepOn);
 
             if (UpdateStepOn != UpdateStepOn.Nothing)
             {
@@ -777,6 +813,8 @@ namespace wyDay.Controls
             }
             else // UpdateStepOn == UpdateStepOn.Nothing
             {
+                this._logger.Info("AutoUpdaterStatus: {0}", AutoUpdaterInfo.AutoUpdaterStatus);
+
                 switch (AutoUpdaterInfo.AutoUpdaterStatus)
                 {
                     case AutoUpdaterStatus.UpdateSucceeded:
@@ -802,6 +840,8 @@ namespace wyDay.Controls
                 AutoUpdaterInfo.ClearSuccessError();
                 AutoUpdaterInfo.Save();
             }
+
+            this._logger.Info("Final update step: {0} IsClosing: {1}", UpdateStepOn, ClosingForInstall);
         }
     }
 

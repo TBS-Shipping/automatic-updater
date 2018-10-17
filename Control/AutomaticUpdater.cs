@@ -852,7 +852,7 @@ namespace wyDay.Controls
             SetMenuText(translation.CheckForUpdatesMenu);
         }
 
-        void auBackend_ProgressChanged(object sender, int progress)
+        void auBackend_ProgressChanged(object sender, int progress, string url)
         {
             if (sender != null)
             {
@@ -866,8 +866,7 @@ namespace wyDay.Controls
                 Text = currentActionText + ", " + progress + "%";
 
             // call the progress changed event
-            if (ProgressChanged != null)
-                ProgressChanged(this, progress);
+            ProgressChanged?.Invoke(this, progress, url);
         }
 
         void auBackend_ClosingAborted(object sender, EventArgs e)

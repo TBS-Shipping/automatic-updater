@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using NLog;
 using wyUpdate.Common;
 
 #if WPF
@@ -36,6 +37,8 @@ namespace wyDay.Controls
         [DllImport("kernel32.dll", EntryPoint = "Wow64EnableWow64FsRedirection")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool EnableWow64FSRedirection([MarshalAs(UnmanagedType.Bool)] bool enable);
+
+        private Logger _logger = LogManager.GetCurrentClassLogger();
 
         static bool? is32on64;
 
@@ -92,6 +95,7 @@ namespace wyDay.Controls
 
             // get the admin filename
             filenames[0] = GetFilename();
+            this._logger.Info("Admin file is located at: '{0}'", filenames[0]);
 
 #if CLIENT
             // if tempFolder is not in ApplicationData, then we're updating on behalf of a limited user
@@ -334,6 +338,7 @@ namespace wyDay.Controls
 
         void Load(string filename)
         {
+            this._logger.Info("Loading configuration from file '{0}' (exists: {1})...", filename, File.Exists(filename));
 #if !CLIENT
             // Disable filesystem redirection on x64 (mostly for Windows Services)
             if (Is32BitProcessOn64BitProcessor())

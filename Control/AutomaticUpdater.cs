@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using wyDay.Common;
 
 namespace wyDay.Controls
 {

@@ -1,4 +1,4 @@
-﻿namespace wyDay.Controls
+﻿namespace wyDay.Common
 {
     /// <summary>
     /// Represents the update steps that the AutomaticUpdater goes through.

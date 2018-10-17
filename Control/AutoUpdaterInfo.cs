@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using NLog;
+using wyDay.Common;
 using wyUpdate.Common;
 
 #if WPF

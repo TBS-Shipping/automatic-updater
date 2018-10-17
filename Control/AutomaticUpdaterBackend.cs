@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using wyDay.Common;
 using wyUpdate.Common;
 
 namespace wyDay.Controls
@@ -281,8 +282,8 @@ namespace wyDay.Controls
             updateHelper.ProgressChanged += updateHelper_ProgressChanged;
             updateHelper.PipeServerDisconnected += updateHelper_PipeServerDisconnected;
             updateHelper.UpdateStepMismatch += updateHelper_UpdateStepMismatch;
-            updateHelper.ResendRestartInfo += updateHelper_ResendRestartInfo;
-            ConfigureNLog(Assembly.GetExecutingAssembly().GetName().Name + "-${shortdate}.log.txt", LogLevel.Debug);
+            updateHelper.ResendRestartInfo += updateHelper_ResendRestartInfo;            
+            ConfigureNLog("./logs/" + Assembly.GetExecutingAssembly().GetName().Name + "-${shortdate}.log.txt", LogLevel.Debug);
             _logger.Debug("Automatic Updater Backend is ready...");
         }
 
